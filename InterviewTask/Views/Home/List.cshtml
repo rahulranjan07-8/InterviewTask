@@ -1,0 +1,26 @@
+﻿@model IEnumerable<InterviewTask.Models.Person>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var person in Model)
+        {
+            <tr>
+                <td>@person.Name</td>
+                <td>@person.Email</td>
+                <td>@person.Phone</td>
+                <td>
+                    <button class="btn btn-primary edit-btn" data-id="@person.Id">Edit</button>
+                    <button class="btn btn-danger delete-btn" data-id="@person.Id">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,79 @@
+﻿@model InterviewTask.Models.Person
+
+<form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post">
+    <input type="hidden" asp-for="Id" id="Id" />
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" id="Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" id="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone"></label>
+        <input asp-for="Phone" class="form-control" id="Phone" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Address"></label>
+        <input asp-for="Address" class="form-control" id="Address" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="State"></label>
+        <select asp-for="State" class="form-control" id="State">
+            <option value="">-- Select State --</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Maharashtra">Maharashtra</option>
+        </select>
+        <span asp-validation-for="State" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="City"></label>
+        <select asp-for="City" class="form-control" id="City">
+            <option value="">-- Select City --</option>
+            <!-- Static options -->
+            <option value="City1">City1</option>
+            <option value="City2">City2</option>
+        </select>
+        <span asp-validation-for="City" class="text-danger"></span>
+    </div>
+    <div class="form-group form-check">
+        <input asp-for="Agree" class="form-check-input" id="AgreeCheckbox" />
+        <label asp-for="Agree" class="form-check-label"></label>
+        <span asp-validation-for="Agree" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" id="SubmitButton" disabled>Submit</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Enable or disable submit button based on checkbox
+            $('#AgreeCheckbox').change(function () {
+                $('#SubmitButton').prop('disabled', !this.checked);
+            });
+
+            // Ensure submit button is enabled if the form is valid
+            $('form').on('input change', function () {
+                var isValid = $(this).find('input, select').filter('[required]').filter(function () {
+                    return !this.value;
+                }).length === 0;
+
+                $('#SubmitButton').prop('disabled', !isValid || !$('#AgreeCheckbox').is(':checked'));
+            });
+
+            // Reset form fields and disable submit button when modal is closed
+            $('#personModal').on('hidden.bs.modal', function () {
+                $('form')[0].reset();
+                $('#SubmitButton').prop('disabled', true);
+            });
+        });
+    </script>
+}

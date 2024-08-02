@@ -1,0 +1,110 @@
+﻿@model List<InterviewTask.Models.Person>
+
+@{
+    ViewData["Title"] = "Interview Task Page";
+}
+
+<div class="text-center">
+    <button class="btn btn-primary" id="addPersonButton">Create a New Form</button>
+    <div id="personModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Person Form</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.Partial("_PersonForm", new InterviewTask.Models.Person())
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var person in Model)
+            {
+                <tr>
+                    <td>@person.Name</td>
+                    <td>@person.Email</td>
+                    <td>@person.Phone</td>
+                    <td>
+                        <button class="btn btn-warning editButton" data-id="@person.Id">Edit</button>
+                        <button class="btn btn-danger deleteButton" data-id="@person.Id">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#addPersonButton').click(function () {
+                $('#personModal').modal('show');
+                $('form').attr('action', '/Home/Create');
+                $('form')[0].reset();
+                $('#SubmitButton').prop('disabled', true);
+            });
+
+            // editing for existing record
+            $(document).on('click', '.editButton', function () {
+                var id = $(this).data('id');
+                $.get('/Home/GetPerson', { id: id }, function (data) {
+                    $('#personModal').modal('show');
+                    $('form').attr('action', '/Home/Edit');
+                    $('#Id').val(data.id);
+                    $('#Name').val(data.name);
+                    $('#Email').val(data.email);
+                    $('#Phone').val(data.phone);
+                    $('#Address').val(data.address);
+                    $('#State').val(data.state);
+                    $('#City').val(data.city);
+                    $('#AgreeCheckbox').prop('checked', data.agree);
+                    $('#SubmitButton').prop('disabled', !data.agree);
+                });
+            });
+
+            // delete record
+            $(document).on('click', '.deleteButton', function () {
+                var id = $(this).data('id');
+                if (confirm('Are you sure you want to delete this person?')) {
+                    $.post('/Home/Delete', { id: id }, function () {
+                        location.reload();
+                    });
+                }
+            });
+
+            // enable/disable submit button
+            $('#AgreeCheckbox').change(function () {
+                $('#SubmitButton').prop('disabled', !this.checked);
+            });
+
+            // submit button is enabled if the form is valid
+            $('form').on('input change', function () {
+                var isValid = $(this).find('input, select').filter('[required]').filter(function () {
+                    return !this.value;
+                }).length === 0;
+
+                $('#SubmitButton').prop('disabled', !isValid || !$('#AgreeCheckbox').is(':checked'));
+            });
+
+            // disable submit button when modal is closed
+            $('#personModal').on('hidden.bs.modal', function () {
+                $('form')[0].reset();
+                $('#SubmitButton').prop('disabled', true);
+            });
+        });
+    </script>
+}
